@@ -173,7 +173,7 @@ def scan_file(filepath: str) -> dict:
 
 
 def prioritize(filepath: str, scan_result: dict) -> str:
-    """Assign priority: high, medium, low, or skip."""
+    """Assign priority: high, medium, or low."""
     ext = Path(filepath).suffix.lower()
 
     # Native code is always high
@@ -191,11 +191,7 @@ def prioritize(filepath: str, scan_result: dict) -> str:
         return "high"
     if has_critical or total >= 5:
         return "medium"
-    if total >= 2:
-        return "low"
-    if total >= 1:
-        return "low"
-    return "skip"
+    return "low"
 
 
 def collect_files(path: str) -> list[str]:
@@ -246,13 +242,13 @@ def main():
         help="Output JSON instead of human-readable table",
     )
     parser.add_argument(
-        "--min-priority", choices=["high", "medium", "low", "skip"],
+        "--min-priority", choices=["high", "medium", "low"],
         default="low",
         help="Minimum priority to include in output (default: low)",
     )
     args = parser.parse_args()
 
-    priority_order = ["high", "medium", "low", "skip"]
+    priority_order = ["high", "medium", "low"]
     min_idx = priority_order.index(args.min_priority)
 
     if args.diff:
@@ -280,7 +276,7 @@ def main():
 
     summary = {
         "totalFiles": len(files),
-        "securityRelevant": sum(1 for r in results if r["priority"] != "skip"),
+        "securityRelevant": len(results),
         "high": sum(1 for r in results if r["priority"] == "high"),
         "medium": sum(1 for r in results if r["priority"] == "medium"),
         "low": sum(1 for r in results if r["priority"] == "low"),
@@ -292,8 +288,7 @@ def main():
     else:
         print(f"Scanned {summary['totalFiles']} files: "
               f"{summary['high']} high, {summary['medium']} medium, "
-              f"{summary['low']} low, "
-              f"{summary['totalFiles'] - summary['securityRelevant']} skipped")
+              f"{summary['low']} low")
         print()
         for r in results:
             signals_str = ", ".join(r["signals"])

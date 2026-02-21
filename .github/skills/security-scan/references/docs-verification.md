@@ -23,7 +23,7 @@ Common examples:
 
 ### Step 1: Identify APIs to Verify
 
-From the risk scoring results, select APIs at **CRITICAL** and **HIGH** tiers for documentation verification. For STANDARD tier, verify only if the finding disposition is uncertain.
+From the risk scoring results, select APIs at **CRITICAL** and **HIGH** tiers for documentation verification. For STANDARD tier, always verify if the finding disposition is uncertain.
 
 ### Step 2: Fetch Documentation
 

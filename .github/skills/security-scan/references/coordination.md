@@ -73,7 +73,7 @@ Before partitioning, run the triage script to identify security-relevant files:
 python .github/skills/security-scan/scripts/scan_security_surface.py <path> --json
 ```
 
-Only partition and dispatch `high` and `medium` priority files. `skip` files never enter the pipeline.
+Partition and dispatch all files by priority. `high` and `medium` get full scanner agents. `low` files still get a single-agent scan — nothing is skipped.
 
 ### Triage agent (Layer 2 — for 20+ security-relevant files)
 
@@ -95,7 +95,7 @@ For each file:
 Return JSON:
 {
   "refinements": [
-    { "path": "...", "newPriority": "high|medium|skip", "reason": "..." }
+    { "path": "...", "newPriority": "high|medium|low", "reason": "..." }
   ]
 }
 ```

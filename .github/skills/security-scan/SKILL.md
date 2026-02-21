@@ -80,7 +80,7 @@ For contract analysis requiring the structured design doc template, see [referen
 
 ## Step 4: Documentation Verification
 
-For CRITICAL and HIGH tier APIs, compare official docs against the code:
+For CRITICAL (score ≥ 51) and HIGH (score ≥ 31) tier APIs, compare official docs against the code:
 
 - Fetch docs via `web_fetch` from `https://learn.microsoft.com/en-us/dotnet/api/{type}.{member}`
 - Compare documented preconditions, exceptions, defaults, and security remarks against the implementation

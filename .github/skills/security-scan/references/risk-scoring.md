@@ -64,10 +64,10 @@ Score based on the method name / verb:
 
 | Score | Tier | Analysis depth |
 |---|---|---|
-| 76–100 | 🔴 **CRITICAL** | Full analysis: contract + serializer audit + docs verification + ensemble |
-| 51–75 | 🟡 **HIGH** | Full analysis: contract + serializer audit + docs verification |
-| 21–50 | 🔵 **STANDARD** | Standard analysis with single-agent verification |
-| 0–20 | ⚪ **MINIMAL** | Quick scan only, skip if time-constrained |
+| 51–100 | 🔴 **CRITICAL** | Full analysis: contract + serializer audit + docs verification + ensemble |
+| 31–50 | 🟡 **HIGH** | Full analysis: contract + serializer audit + docs verification |
+| 11–30 | 🔵 **STANDARD** | Standard analysis with single-agent verification |
+| 0–10 | ⚪ **MINIMAL** | Quick scan — still analyzed, never skipped |
 
 ## Worked Examples
 
@@ -76,7 +76,7 @@ Score based on the method name / verb:
 - Method: `Create` (+15)
 - Return: `XmlReader` (+20)
 - Namespace: `System.Xml` (+10)
-- **Total: 70 → HIGH**
+- **Total: 70 → CRITICAL**
 
 ### Example 2: `String.IsNullOrEmpty(string)`
 - Parameter: `string` general (+5)
@@ -97,7 +97,7 @@ Score based on the method name / verb:
 - Method: `Read` (+15)
 - Return: `string` structured data (+10)
 - Namespace: `System.IO` (+10)
-- **Total: 45 → STANDARD**
+- **Total: 45 → CRITICAL**
 
 ## Usage
 
