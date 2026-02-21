@@ -129,3 +129,42 @@ For each contract gap found, assess:
 3. **What would happen if a consumer misuses this?** — Document the concrete failure mode (crash, memory corruption, data leak, etc.)
 
 Record findings in the anti-pattern catalog (see [anti-patterns/README.md](anti-patterns/README.md)) with the `Downstream impact` field.
+
+## Structured Security Design Doc Template
+
+For CRITICAL and HIGH tier APIs (per [risk-scoring.md](risk-scoring.md)), produce a structured security design document:
+
+### Per-Parameter Security Classification
+
+For each parameter on the public method:
+
+| Parameter | Type | Classification | Validation | Safe for untrusted input? | Caller assertions |
+|---|---|---|---|---|---|
+| `input` | `Stream` | **UNSAFE** | None | No | Caller must limit stream size |
+| `options` | `JsonSerializerOptions` | **CONDITIONAL** | Partial | Only if `MaxDepth` is set | Caller must configure `MaxDepth` |
+| `cancellationToken` | `CancellationToken` | **SAFE** | N/A | Yes | None |
+
+**Classifications:**
+- **SAFE**: API validates this parameter. Throwing an exception on bad input = SAFE.
+- **UNSAFE**: No validation. Caller must ensure correctness.
+- **CONDITIONAL**: Safe only if specific preconditions are met. Document the conditions.
+
+### Threat Model
+
+| Category | API defends against | Caller must defend against |
+|---|---|---|
+| Input validation | Null arguments (throws `ArgumentNullException`) | Oversized input, malformed encoding |
+| Resource exhaustion | — | Unbounded streams, large payloads |
+| Type safety | Generic type constraints | Runtime type of deserialized objects |
+
+### Anti-Scenarios
+
+Document concrete misuse patterns with CWE references:
+
+```
+Anti-scenario 1: Deserializing unbounded network stream
+- CWE: CWE-400 (Resource Exhaustion)
+- Code: JsonSerializer.Deserialize<T>(networkStream)
+- Impact: OOM crash from multi-GB payload
+- Fix: Wrap stream with size-limiting wrapper or check Content-Length first
+```
