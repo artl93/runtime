@@ -1,6 +1,6 @@
 # Security Anti-Pattern Catalog
 
-Structured catalog of security anti-patterns for .NET runtime APIs. Each entry is designed to be reusable when scanning downstream repos (ASP.NET Core, SDK, etc.).
+Structured catalog of security anti-patterns for .NET APIs. Each entry is designed to be reusable across any .NET codebase.
 
 ## Contents
 
@@ -33,7 +33,7 @@ Each anti-pattern follows this structure:
 - **Contract violated**: What assumption is broken
 - **Detection**: How to find this pattern (grep, code inspection)
 - **Fix**: How to remediate
-- **Downstream impact**: How this affects consumer repos (ASP.NET Core, SDK, etc.)
+- **Downstream impact**: How this affects consumer code
 ```
 
 ---
@@ -46,7 +46,7 @@ Each anti-pattern follows this structure:
 - **Contract violated**: Caller assumes the source is bounded; the API imposes no limit
 - **Detection**: `grep -rn "ReadToEnd\|ReadAsStringAsync\|ReadAsByteArrayAsync"` — flag when the stream source is network, file upload, or other external input
 - **Fix**: Use `ReadAsync` with a bounded buffer and byte count limit. For HTTP, set `HttpClient.MaxResponseContentBufferSize`. For request bodies, enforce `Content-Length` limits at the middleware level.
-- **Downstream impact**: ASP.NET Core middleware reading request bodies (`Request.Body`), `HttpClient` consumers, file upload handlers
+- **Downstream impact**: Middleware reading request bodies, `HttpClient` consumers, file upload handlers
 
 ### AP-002: Unbounded allocation from external size
 
@@ -76,7 +76,7 @@ Each anti-pattern follows this structure:
 - **Contract violated**: Serializer assumes type metadata is trusted
 - **Detection**: `grep -rn "TypeNameHandling"` — flag if value is not `None` or if `SerializationBinder` is absent/unrestricted
 - **Fix**: Set `TypeNameHandling = None`. If polymorphism needed, use `System.Text.Json` with explicit `[JsonDerivedType]` attributes.
-- **Downstream impact**: ASP.NET Core JSON endpoints, SignalR message handling, any API accepting JSON with type metadata
+- **Downstream impact**: JSON endpoints, SignalR message handling, any API accepting JSON with type metadata
 
 ### AP-005: JsonDocument parse without size limits
 
@@ -86,7 +86,7 @@ Each anti-pattern follows this structure:
 - **Contract violated**: Caller assumes input is well-formed and reasonably sized
 - **Detection**: `grep -rn "JsonDocument.Parse\|JsonSerializer.Deserialize"` — flag when input stream is from network/file without prior size validation
 - **Fix**: Set `JsonDocumentOptions.MaxDepth` / `JsonSerializerOptions.MaxDepth`. Limit stream size before parsing (e.g., `Content-Length` check or wrapping with a length-limited stream).
-- **Downstream impact**: ASP.NET Core model binding, minimal API endpoints, any HTTP handler parsing JSON request bodies
+- **Downstream impact**: Model binding, minimal API endpoints, any HTTP handler parsing JSON request bodies
 
 ### AP-006: XmlReader without DTD prohibition
 
@@ -96,7 +96,7 @@ Each anti-pattern follows this structure:
 - **Contract violated**: Caller assumes XML is data-only; DTD processing enables active content
 - **Detection**: `grep -rn "XmlReader.Create"` — flag if `DtdProcessing` is not set to `Prohibit`
 - **Fix**: Always pass `new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit }`.
-- **Downstream impact**: ASP.NET Core XML formatters, SOAP service consumers, config file parsers
+- **Downstream impact**: XML formatters, SOAP service consumers, config file parsers
 
 ### AP-007: Unsanitized path combination
 

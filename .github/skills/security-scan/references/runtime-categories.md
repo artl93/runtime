@@ -1,4 +1,4 @@
-# Security Categories for dotnet/runtime
+# Security Categories
 
 ## Contents
 
@@ -13,7 +13,7 @@
 - [DOS and resource exhaustion](#dos--resource-exhaustion)
 - [API contract abuse](#api-contract-abuse)
 
-## dotnet/runtime-Specific Concerns
+## .NET-Specific Concerns
 
 ### Unsafe Code & Memory Safety
 

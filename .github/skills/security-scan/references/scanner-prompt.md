@@ -63,13 +63,13 @@ For each potential finding, attempt to disprove it:
 | AP-014 | `ISerializable` constructor trusting `SerializationInfo` values | Object injection |
 | AP-015 | `List.Add`/`Dictionary.Add` in loop with attacker-controlled count | DOS: unbounded collection growth |
 
-### Precedents (dotnet/runtime-specific)
+### Precedents (.NET-specific)
 
 - `Debug.Assert` is NOT a security boundary — stripped in release builds
 - `internal` is NOT a security boundary — accessible via reflection
 - `Span<T>` bounds checking is automatic — missing manual checks are not vulns
 - `ThrowHelper` bypasses ARE security-relevant — wrong conditions = ineffective check
-- Native C/C++ under `src/coreclr/` and `src/native/` IS memory-unsafe — flag issues here
+- Native C/C++ code IS memory-unsafe — flag issues here
 - STJ source generators are trusted — lower scrutiny than hand-written converters
 - Volatile/Interlocked correctness matters — TOCTOU on security flags is real
 

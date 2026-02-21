@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Security surface triage scanner for dotnet/runtime.
+Security surface triage scanner for .NET codebases.
 
 Scans source files for security-sensitive patterns and outputs a prioritized
 JSON file list. Designed to run fast (<5s) with no dependencies beyond stdlib.

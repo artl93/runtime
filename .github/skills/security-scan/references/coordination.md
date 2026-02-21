@@ -70,7 +70,7 @@ FROM scan_targets GROUP BY status;
 Before partitioning, run the triage script to identify security-relevant files:
 
 ```bash
-python .github/skills/security-scan/scripts/scan_security_surface.py src/libraries/System.Net.Http/src --json
+python .github/skills/security-scan/scripts/scan_security_surface.py <path> --json
 ```
 
 Only partition and dispatch `high` and `medium` priority files. `skip` files never enter the pipeline.
@@ -102,16 +102,16 @@ Return JSON:
 
 ### By library (preferred for directory audits)
 
-Each `src/libraries/<Name>` directory is a natural partition. List libraries in scope, then assign each to a subagent:
+Each project or library directory is a natural partition. List projects in scope, then assign each to a subagent:
 
 ```bash
-# List libraries under a directory
-ls -d src/libraries/System.Net.*/src | head -20
+# List libraries/projects under a target directory
+ls -d src/*/ | head -20
 ```
 
 ### By file type (for mixed-language areas)
 
-When scanning `src/coreclr/` or `src/native/`, partition by language since vulnerability categories differ:
+When scanning directories with mixed managed and native code, partition by language since vulnerability categories differ:
 
 | Partition | File types | Focus |
 |---|---|---|
@@ -134,7 +134,7 @@ Launch one `general-purpose` subagent per library/partition:
 ```
 Security scan the following library: {LIBRARY_NAME}
 
-Source directory: src/libraries/{LIBRARY_NAME}/src/
+Source directory: {SOURCE_DIRECTORY}/
 Files to scan:
 {FILE_LIST}
 
@@ -184,7 +184,7 @@ Steps:
 2. Check callers of the vulnerable function — are inputs validated upstream?
 3. Check callees — does the called function do its own validation?
 4. Search for similar patterns in the codebase (grep for the function name)
-5. Check if this matches a known-safe pattern in dotnet/runtime
+5. Check if this matches a known-safe pattern in the codebase
 
 Return JSON:
 {
@@ -265,13 +265,13 @@ CREATE TABLE IF NOT EXISTS scan_cache (
 
 ```bash
 # Get current file hash for cache comparison
-git hash-object src/libraries/System.Net.Http/src/HttpClient.cs
+git hash-object path/to/file.cs
 ```
 
 ```sql
 -- Check if a file needs re-scanning
 SELECT file_path FROM scan_cache
-WHERE file_path = 'src/libraries/System.Net.Http/src/HttpClient.cs'
+WHERE file_path = 'path/to/file.cs'
   AND file_hash = 'abc1234';
 -- If row exists, skip this file. If not, scan and insert/update.
 ```

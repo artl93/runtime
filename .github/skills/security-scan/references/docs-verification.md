@@ -11,7 +11,7 @@ Compare official learn.microsoft.com documentation against actual implementation
 
 ## Why This Matters
 
-Downstream consumers (ASP.NET Core, SDK, user applications) rely on Microsoft's official documentation to use APIs safely. When docs are wrong, incomplete, or misleading about security behavior, every consumer inherits the risk.
+Downstream consumers rely on official documentation to use APIs safely. When docs are wrong, incomplete, or misleading about security behavior, every consumer inherits the risk.
 
 Common examples:
 - Docs say "throws `ArgumentNullException`" but code silently accepts null

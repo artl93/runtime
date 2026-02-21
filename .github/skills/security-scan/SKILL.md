@@ -1,11 +1,11 @@
 ---
 name: security-scan
-description: Perform a security-focused review of code in dotnet/runtime, thinking like a security researcher to find exploitable vulnerabilities. Use when asked to "security scan", "security review", "find vulnerabilities", "check for security issues", or "audit security". Supports reviewing diffs, specific files, or entire directories. Analyzes API contracts, serializer safety, DOS surface, and documentation accuracy. Anti-pattern catalog and CodeQL rules are reusable for downstream repos like ASP.NET Core.
+description: Perform a security-focused review of code, thinking like a security researcher to find exploitable vulnerabilities. Use when asked to "security scan", "security review", "find vulnerabilities", "check for security issues", or "audit security". Supports reviewing diffs, specific files, or entire directories. Analyzes API contracts, serializer safety, DOS surface, and documentation accuracy. Anti-pattern catalog and CodeQL rules are reusable across repos.
 ---
 
 # Security Scan
 
-Security-researcher-style audit for dotnet/runtime. Reasons about data flow, trust boundaries, exploit paths, API contract abuse, and documentation accuracy.
+Security-researcher-style audit for .NET codebases. Reasons about data flow, trust boundaries, exploit paths, API contract abuse, and documentation accuracy.
 
 > 🚨 **Human-in-the-loop**: Identifies vulnerabilities and suggests fixes but NEVER auto-applies patches. All findings require human review.
 

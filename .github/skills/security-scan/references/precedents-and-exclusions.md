@@ -1,13 +1,13 @@
-# Precedents and Exclusions for dotnet/runtime
+# Precedents and Exclusions
 
 ## Contents
 
 - [Hard exclusions](#hard-exclusions--do-not-report)
-- [Codebase-specific precedents](#precedents)
+- [.NET codebase precedents](#precedents)
 
 ## Hard Exclusions — Do NOT Report
 
-These categories produce excessive noise in dotnet/runtime and must be automatically excluded:
+These categories produce excessive noise in .NET codebases and should be automatically excluded:
 
 1. **~~Denial of Service (DOS)~~** — Now **in scope** for public API surface reachable by external callers. See [runtime-categories.md](runtime-categories.md#dos--resource-exhaustion). Still excluded for internal-only APIs and test code.
 2. **Rate limiting** — Missing rate limits or throttling
@@ -22,16 +22,16 @@ These categories produce excessive noise in dotnet/runtime and must be automatic
 11. **Outdated dependencies** — Managed separately
 12. **Client-side validation** — Server-side is responsible
 13. **Insecure defaults in test/sample code** — Only flag in production code paths
-14. **Memory safety in managed C# code** — Only flag in `unsafe` blocks, native interop, or C/C++ under `src/coreclr/` / `src/native/`
+14. **Memory safety in managed C# code** — Only flag in `unsafe` blocks, native interop, or C/C++ source directories
 
 ## Precedents
 
-These judgment calls reduce false positives specific to this codebase:
+These judgment calls reduce false positives in .NET codebases:
 
 1. **`Debug.Assert` is not a security boundary.** Asserts are stripped in release builds. Security checks must use exceptions or fail-fast.
 2. **`internal` is not a security boundary.** Internal APIs can be accessed via reflection.
 3. **`Span<T>` bounds checking is automatic.** The runtime checks bounds on span indexing. Missing manual bounds checks are not vulnerabilities.
 4. **`ThrowHelper` methods are security-relevant.** When `ThrowHelper` is bypassed or conditions are wrong, the security check is ineffective.
-5. **Native code under `src/coreclr/` and `src/native/` IS memory-unsafe.** C/C++ code requires manual bounds checking, null checks, and lifetime management.
+5. **Native C/C++ code IS memory-unsafe.** C/C++ code requires manual bounds checking, null checks, and lifetime management.
 6. **`System.Text.Json` source generators are trusted.** Generated serialization code doesn't need the same scrutiny as hand-written custom converters.
 7. **Volatile/Interlocked correctness matters for security.** Race conditions in security checks (e.g., TOCTOU on permission flags) are real vulnerabilities.

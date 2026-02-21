@@ -27,7 +27,7 @@ Implicit and emergent contracts are where most security bugs hide.
 Find all `public` and `protected` methods on public types in the target library:
 
 ```bash
-grep -rn "public\s\+\(static\s\+\)\?\(async\s\+\)\?\S\+\s\+\w\+\s*(" src/libraries/<Lib>/src/ --include="*.cs" | grep -v "/ref/" | grep -v "/tests/"
+grep -rn "public\s\+\(static\s\+\)\?\(async\s\+\)\?\S\+\s\+\w\+\s*(" <target-directory> --include="*.cs" | grep -v "/ref/" | grep -v "/tests/"
 ```
 
 Focus on methods that accept potentially untrusted input: `string`, `byte[]`, `Stream`, `ReadOnlySpan<byte>`, `ReadOnlyMemory<byte>`, `ReadOnlySequence<byte>`.
@@ -80,8 +80,8 @@ When component A calls component B's public API:
 
 Search for cross-component calls:
 ```bash
-# Find where System.Text.Json is called from System.Net.Http
-grep -rn "JsonSerializer\|JsonDocument\|Utf8JsonReader" src/libraries/System.Net.Http/src/
+# Find cross-component serializer usage
+grep -rn "JsonSerializer\|JsonDocument\|Utf8JsonReader" <target-directory>
 ```
 
 ## Contract Violation Patterns
@@ -124,7 +124,7 @@ grep -rn "JsonSerializer\|JsonDocument\|Utf8JsonReader" src/libraries/System.Net
 
 For each contract gap found, assess:
 
-1. **Who calls this API?** — Is it used by ASP.NET Core, EF Core, SDK, or other framework components?
+1. **Who calls this API?** — Is it used by other framework components or downstream consumers?
 2. **Can an external attacker reach this through a downstream caller?** — Trace the call chain from HTTP endpoint to the vulnerable API
 3. **What would happen if a consumer misuses this?** — Document the concrete failure mode (crash, memory corruption, data leak, etc.)
 
