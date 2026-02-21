@@ -37,19 +37,43 @@ Before analyzing code, understand the security posture of the affected area usin
 2. **Trust boundaries** — where external input enters; what crosses process, AppDomain, or serialization boundaries
 3. **Related security tests** — search for `*Security*`, `*Injection*`, `*Sanitiz*`, `*Untrusted*` in nearby test projects
 
-## Step 3: Analyze
+## Step 3: Analyze (dispatch scanner agents)
 
-Execute a multi-phase analysis:
+**This skill acts as the orchestrator.** Deep analysis is performed by scanner sub-agents with full security domain knowledge loaded into their context.
 
-**Phase 1 — Vulnerability assessment:** Trace data flow from untrusted inputs to sensitive operations. Check for injection, unsafe deserialization, privilege boundary crossings, TOCTOU issues, and DOS vectors.
+### Dispatching scanners
 
-**Phase 2 — Contract analysis:** For public APIs, check for implicit contracts, missing validation, inconsistent overloads, and cross-component mismatches. Produce per-parameter safety classifications (SAFE/UNSAFE/CONDITIONAL) for CRITICAL/HIGH tier APIs. See [references/contract-analysis.md](references/contract-analysis.md).
+1. Read [references/scanner-prompt.md](references/scanner-prompt.md) — this is the concentrated "security researcher brain"
+2. For each batch of files (max 10-15 per agent), launch a `general-purpose` sub-agent via the `task` tool:
 
-**Phase 3 — Serializer audit:** For any serializer usage flagged by triage, apply the per-serializer checklist. See [references/serializer-audit.md](references/serializer-audit.md).
+```
+task(
+  agent_type="general-purpose",
+  prompt="""
+  {SCANNER_PROMPT_CONTENT}
 
-**Phase 4 — Self-critique:** For each potential finding, attempt to disprove it. Verify against the full source file, check for mitigations in callers/callees. Only keep findings with confidence ≥ 8/10.
+  ## Your Assignment
 
-**Reference materials** (read as needed):
+  Analyze these files for security vulnerabilities:
+  {FILE_LIST_WITH_PATHS}
+
+  Library: {LIBRARY_NAME}
+  Context: {BRIEF_DESCRIPTION_OF_WHAT_THIS_LIBRARY_DOES}
+
+  Read each file and apply the full analysis framework above. Return structured JSON findings.
+  """
+)
+```
+
+3. For diff scope with few files, you may analyze directly instead of dispatching — read `scanner-prompt.md` for the analysis framework and apply it yourself.
+
+### When to use deep reference docs
+
+If the scanner flags serializer-related findings, consult [references/serializer-audit.md](references/serializer-audit.md) for per-serializer details.
+
+For contract analysis requiring the structured design doc template, see [references/contract-analysis.md](references/contract-analysis.md).
+
+**Additional reference materials** (read as needed):
 - **Vulnerability categories**: [references/runtime-categories.md](references/runtime-categories.md)
 - **Exclusions and precedents**: [references/precedents-and-exclusions.md](references/precedents-and-exclusions.md)
 - **Known anti-patterns**: [references/anti-patterns/README.md](references/anti-patterns/README.md)
@@ -68,12 +92,30 @@ See [references/docs-verification.md](references/docs-verification.md) for the f
 
 ### Verification
 
-When the `task` tool is available, use parallel verification. For critical findings or uncertain dispositions, use ensemble verification with multiple models: [references/ensemble-verification.md](references/ensemble-verification.md)
+When the `task` tool is available, use parallel verification. For each finding from scanner agents, launch a separate `explore` agent to independently verify:
 
-Basic verification:
-1. **Discovery agent**: `general-purpose` sub-agent with the diff/files and categories from [references/runtime-categories.md](references/runtime-categories.md).
-2. **Verification agents**: Parallel `explore` agents to independently verify each finding.
-3. **Filter**: Only keep findings with verification confidence ≥ 8.
+```
+task(
+  agent_type="explore",
+  prompt="""
+  Verify this security finding:
+
+  File: {FILE_PATH}:{LINE}
+  Category: {CATEGORY}
+  Claimed vulnerability: {DESCRIPTION}
+  Disposition: {DISPOSITION}
+
+  1. Read the full source file
+  2. Check callers — do they validate before calling?
+  3. Check callees — does the function do its own validation?
+  4. Search for similar patterns elsewhere in the codebase
+
+  Return JSON: { "verified": bool, "confidence": 0-10, "justification": "..." }
+  """
+)
+```
+
+For critical findings or uncertain dispositions, use ensemble verification: [references/ensemble-verification.md](references/ensemble-verification.md)
 
 ### Disposition Classification
 
